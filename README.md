@@ -4,7 +4,7 @@
 ### protobuf for Actionscript 3 on Windows
 ================================================================
 该项目搭建了**AS3 protobuf**所需的**Windows**运行环境以及**AS3**类库，整合了**Google [protobuf][1]**和**[protoc-gen-as3][2]**第三方插件资源
-[1]: http://code.google.com/p/protobuf/ "http://code.google.com/p/protobuf/"
+[1]: http://code.google.com/p/protobuf/ "[2.4.1] http://code.google.com/p/protobuf/"
 [2]: https://code.google.com/p/protoc-gen-as3/ "https://code.google.com/p/protoc-gen-as3/"
 
 ### 目录说明
