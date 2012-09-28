@@ -37,27 +37,363 @@
 
 <h1></h1>
 
-<p>该项目搭建了AS3 protobuf所需的Windows运行环境以及AS3类库，整合了Google <a href="http://code.google.com/p/protobuf/" title="http://code.google.com/p/protobuf/">protobuf</a>和<a href="https://code.google.com/p/protoc-gen-as3/" title="https://code.google.com/p/protoc-gen-as3/">protoc-gen-as3</a>第三方插件资源</p>
+<p>该项目搭建了<strong>AS3 protobuf</strong>所需的<strong>Windows</strong>运行环境以及<strong>AS3</strong>类库，整合了<strong>Google <a href="http://code.google.com/p/protobuf/" title="http://code.google.com/p/protobuf/">protobuf</a></strong>和<strong><a href="https://code.google.com/p/protoc-gen-as3/" title="https://code.google.com/p/protoc-gen-as3/">protoc-gen-as3</a></strong>第三方插件资源</p>
 
 <h3>目录说明</h3>
 
 <h1></h1>
 
 <ol>
-<li>src目录包含了protobuf编解码所需要的AS3代码库，需要导入项目</li>
-<li>lib目录包含了AS3代码库的SWC版本</li>
-<li>proto目录有一个简单的hello.proto文件，仅用作测试用途</li>
-</ol><h3>快速熟悉</h3>
+<li>
+<strong>src</strong>目录包含了<strong>protobuf</strong>编解码所需要的<strong>AS3</strong>代码库，需要导入项目</li>
+<li>
+<strong>lib</strong>目录包含了<strong>AS3</strong>代码库的<strong>SWC</strong>版本</li>
+<li>
+<strong>proto</strong>目录有一个简单的<strong>hello.proto</strong>文件，仅用作测试用途</li>
+</ol><h3>protobuf使用帮助</h3>
 
 <h1></h1>
 
-<p>进入sdk目录运行protobuf.bat，输入hello并回车，这时会生成output目录，这个目录包含了生成的AS3代码</p>
+<p>进入<strong>sdk</strong>目录，打开<strong>setup.bat</strong>文件，初始化一下配置</p>
 
-<h3>NOTE</h3>
+<ul>
+<li>把<strong>PROTO_DIR</strong>修改为*.proto文件的存储目录</li>
+<li>把<strong>OUTPUT_DIR</strong>修改为生成<strong>AS3</strong>代码的输出目录</li>
+</ul><p>其实在默认配置下，直接运行<strong>protobuf.bat</strong>输入hello既可以在<strong>OUTPUT_DIR</strong>目录生成实例代码</p>
 
-<h1></h1>
+<pre><code>----------------------------
+Type proto file name:
+hello
 
-<p>proto、output两个目录是可配置的，详情查看<strong>sdk/README.md</strong>文件</p>
+... ... ...
+
+C:\Users\larryhou\Downloads\protobuf\protobuf\sdk&gt;.\framework\protoc.exe --proto
+_path="..\proto" --plugin=protoc-gen-as3=".\framework\protoc-gen-as3.bat" --as3_
+out="..\output" "..\proto\hello.proto"
+
+DONE! Press any key to process another proto file...
+</code></pre>
+
+<p><strong>hello.proto</strong>文件内容  </p>
+
+<pre><code>message HelloWorld{
+    optional int32 code = 1;
+    optional string name = 2;
+    optional Info info = 3;
+
+    message Info{
+        optional string version = 1;
+    }
+}
+</code></pre>
+
+<p><strong>HelloWorld.as</strong>代码内容   </p>
+
+<div class="highlight"><pre><span class="kd">package</span>  <span class="p">{</span>
+    <span class="kd">import</span> <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="o">*;</span>
+    <span class="nx">use</span> <span class="kd">namespace</span> <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">used_by_generated_code</span><span class="o">;</span>
+    <span class="kd">import</span> <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">fieldDescriptors</span><span class="p">.</span><span class="o">*;</span>
+    <span class="kd">import</span> <span class="nx">flash</span><span class="p">.</span><span class="nx">utils</span><span class="p">.</span><span class="nb">Endian</span><span class="o">;</span>
+    <span class="kd">import</span> <span class="nx">flash</span><span class="p">.</span><span class="nx">utils</span><span class="p">.</span><span class="nb">IDataInput</span><span class="o">;</span>
+    <span class="kd">import</span> <span class="nx">flash</span><span class="p">.</span><span class="nx">utils</span><span class="p">.</span><span class="nb">IDataOutput</span><span class="o">;</span>
+    <span class="kd">import</span> <span class="nx">flash</span><span class="p">.</span><span class="nx">utils</span><span class="p">.</span><span class="nb">IExternalizable</span><span class="o">;</span>
+    <span class="kd">import</span> <span class="nx">flash</span><span class="p">.</span><span class="nx">errors</span><span class="p">.</span><span class="nb">IOError</span><span class="o">;</span>
+    <span class="kd">import</span> <span class="nx">HelloWorld</span><span class="p">.</span><span class="nx">Info</span><span class="o">;</span>
+    <span class="c1">// @@protoc_insertion_point(imports)</span>
+
+    <span class="c1">// @@protoc_insertion_point(class_metadata)</span>
+    <span class="kd">public</span> <span class="kd">dynamic</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nx">HelloWorld</span> <span class="kd">extends</span> <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">Message</span> <span class="p">{</span>
+        <span class="cm">/**</span>
+<span class="cm">         *  @private</span>
+<span class="cm">         */</span>
+        <span class="kd">public</span> <span class="kd">static</span> <span class="kd">const</span> <span class="nx">CODE</span><span class="o">:</span><span class="nx">FieldDescriptor$TYPE_INT32</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FieldDescriptor$TYPE_INT32</span><span class="p">(</span><span class="s2">"HelloWorld.code"</span><span class="o">,</span> <span class="s2">"code"</span><span class="o">,</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">3</span><span class="p">)</span> <span class="o">|</span> <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">WireType</span><span class="p">.</span><span class="nx">VARINT</span><span class="p">);</span>
+
+        <span class="kd">private</span> <span class="k">var</span> <span class="nx">code$field</span><span class="o">:</span><span class="nb">int</span><span class="o">;</span>
+
+        <span class="kd">private</span> <span class="k">var</span> <span class="nx">hasField$0</span><span class="o">:</span><span class="nb">uint</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+
+        <span class="kd">public</span> <span class="kd">function</span> <span class="nx">clearCode</span><span class="p">()</span><span class="o">:</span><span class="nx">void</span> <span class="p">{</span>
+            <span class="nx">hasField$0</span> <span class="o">&amp;=</span> <span class="mh">0xfffffffe</span><span class="o">;</span>
+            <span class="nx">code$field</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">int</span><span class="p">();</span>
+        <span class="p">}</span>
+
+        <span class="kd">public</span> <span class="kd">function</span> <span class="kd">get</span> <span class="nx">hasCode</span><span class="p">()</span><span class="o">:</span><span class="nb">Boolean</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="p">(</span><span class="nx">hasField$0</span> <span class="o">&amp;</span> <span class="mh">0x1</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="o">;</span>
+        <span class="p">}</span>
+
+        <span class="kd">public</span> <span class="kd">function</span> <span class="kd">set</span> <span class="nx">code</span><span class="p">(</span><span class="nx">value</span><span class="o">:</span><span class="nb">int</span><span class="p">)</span><span class="o">:</span><span class="nx">void</span> <span class="p">{</span>
+            <span class="nx">hasField$0</span> <span class="o">|=</span> <span class="mh">0x1</span><span class="o">;</span>
+            <span class="nx">code$field</span> <span class="o">=</span> <span class="nx">value</span><span class="o">;</span>
+        <span class="p">}</span>
+
+        <span class="kd">public</span> <span class="kd">function</span> <span class="kd">get</span> <span class="nx">code</span><span class="p">()</span><span class="o">:</span><span class="nb">int</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nx">code$field</span><span class="o">;</span>
+        <span class="p">}</span>
+
+        <span class="cm">/**</span>
+<span class="cm">         *  @private</span>
+<span class="cm">         */</span>
+        <span class="kd">public</span> <span class="kd">static</span> <span class="kd">const</span> <span class="nx">NAME</span><span class="o">:</span><span class="nx">FieldDescriptor$TYPE_STRING</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FieldDescriptor$TYPE_STRING</span><span class="p">(</span><span class="s2">"HelloWorld.name"</span><span class="o">,</span> <span class="s2">"name"</span><span class="o">,</span> <span class="p">(</span><span class="mi">2</span> <span class="o">&lt;&lt;</span> <span class="mi">3</span><span class="p">)</span> <span class="o">|</span> <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">WireType</span><span class="p">.</span><span class="nx">LENGTH_DELIMITED</span><span class="p">);</span>
+
+        <span class="kd">private</span> <span class="k">var</span> <span class="nx">name$field</span><span class="o">:</span><span class="nb">String</span><span class="o">;</span>
+
+        <span class="kd">public</span> <span class="kd">function</span> <span class="nx">clearName</span><span class="p">()</span><span class="o">:</span><span class="nx">void</span> <span class="p">{</span>
+            <span class="nx">name$field</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="p">}</span>
+
+        <span class="kd">public</span> <span class="kd">function</span> <span class="kd">get</span> <span class="nx">hasName</span><span class="p">()</span><span class="o">:</span><span class="nb">Boolean</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nx">name$field</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="p">}</span>
+
+        <span class="kd">public</span> <span class="kd">function</span> <span class="kd">set</span> <span class="nx">name</span><span class="p">(</span><span class="nx">value</span><span class="o">:</span><span class="nb">String</span><span class="p">)</span><span class="o">:</span><span class="nx">void</span> <span class="p">{</span>
+            <span class="nx">name$field</span> <span class="o">=</span> <span class="nx">value</span><span class="o">;</span>
+        <span class="p">}</span>
+
+        <span class="kd">public</span> <span class="kd">function</span> <span class="kd">get</span> <span class="nx">name</span><span class="p">()</span><span class="o">:</span><span class="nb">String</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nx">name$field</span><span class="o">;</span>
+        <span class="p">}</span>
+
+        <span class="cm">/**</span>
+<span class="cm">         *  @private</span>
+<span class="cm">         */</span>
+        <span class="kd">public</span> <span class="kd">static</span> <span class="kd">const</span> <span class="nx">INFO</span><span class="o">:</span><span class="nx">FieldDescriptor$TYPE_MESSAGE</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FieldDescriptor$TYPE_MESSAGE</span><span class="p">(</span><span class="s2">"HelloWorld.info"</span><span class="o">,</span> <span class="s2">"info"</span><span class="o">,</span> <span class="p">(</span><span class="mi">3</span> <span class="o">&lt;&lt;</span> <span class="mi">3</span><span class="p">)</span> <span class="o">|</span> <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">WireType</span><span class="p">.</span><span class="nx">LENGTH_DELIMITED</span><span class="o">,</span> <span class="kd">function</span><span class="p">()</span><span class="o">:</span><span class="nb">Class</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">HelloWorld</span><span class="p">.</span><span class="nx">Info</span><span class="o">;</span> <span class="p">});</span>
+
+        <span class="kd">private</span> <span class="k">var</span> <span class="nx">info$field</span><span class="o">:</span><span class="nx">HelloWorld</span><span class="p">.</span><span class="nx">Info</span><span class="o">;</span>
+
+        <span class="kd">public</span> <span class="kd">function</span> <span class="nx">clearInfo</span><span class="p">()</span><span class="o">:</span><span class="nx">void</span> <span class="p">{</span>
+            <span class="nx">info$field</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="p">}</span>
+
+        <span class="kd">public</span> <span class="kd">function</span> <span class="kd">get</span> <span class="nx">hasInfo</span><span class="p">()</span><span class="o">:</span><span class="nb">Boolean</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nx">info$field</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="p">}</span>
+
+        <span class="kd">public</span> <span class="kd">function</span> <span class="kd">set</span> <span class="nx">info</span><span class="p">(</span><span class="nx">value</span><span class="o">:</span><span class="nx">HelloWorld</span><span class="p">.</span><span class="nx">Info</span><span class="p">)</span><span class="o">:</span><span class="nx">void</span> <span class="p">{</span>
+            <span class="nx">info$field</span> <span class="o">=</span> <span class="nx">value</span><span class="o">;</span>
+        <span class="p">}</span>
+
+        <span class="kd">public</span> <span class="kd">function</span> <span class="kd">get</span> <span class="nx">info</span><span class="p">()</span><span class="o">:</span><span class="nx">HelloWorld</span><span class="p">.</span><span class="nx">Info</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nx">info$field</span><span class="o">;</span>
+        <span class="p">}</span>
+
+        <span class="cm">/**</span>
+<span class="cm">         *  @private</span>
+<span class="cm">         */</span>
+        <span class="kd">override</span> <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">used_by_generated_code</span> <span class="kd">final</span> <span class="kd">function</span> <span class="nx">writeToBuffer</span><span class="p">(</span><span class="nx">output</span><span class="o">:</span><span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">WritingBuffer</span><span class="p">)</span><span class="o">:</span><span class="nx">void</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">hasCode</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">WriteUtils</span><span class="p">.</span><span class="nx">writeTag</span><span class="p">(</span><span class="nx">output</span><span class="o">,</span> <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">WireType</span><span class="p">.</span><span class="nx">VARINT</span><span class="o">,</span> <span class="mi">1</span><span class="p">);</span>
+                <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">WriteUtils</span><span class="p">.</span><span class="nx">write$TYPE_INT32</span><span class="p">(</span><span class="nx">output</span><span class="o">,</span> <span class="nx">code$field</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">hasName</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">WriteUtils</span><span class="p">.</span><span class="nx">writeTag</span><span class="p">(</span><span class="nx">output</span><span class="o">,</span> <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">WireType</span><span class="p">.</span><span class="nx">LENGTH_DELIMITED</span><span class="o">,</span> <span class="mi">2</span><span class="p">);</span>
+                <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">WriteUtils</span><span class="p">.</span><span class="nx">write$TYPE_STRING</span><span class="p">(</span><span class="nx">output</span><span class="o">,</span> <span class="nx">name$field</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">hasInfo</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">WriteUtils</span><span class="p">.</span><span class="nx">writeTag</span><span class="p">(</span><span class="nx">output</span><span class="o">,</span> <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">WireType</span><span class="p">.</span><span class="nx">LENGTH_DELIMITED</span><span class="o">,</span> <span class="mi">3</span><span class="p">);</span>
+                <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">WriteUtils</span><span class="p">.</span><span class="nx">write$TYPE_MESSAGE</span><span class="p">(</span><span class="nx">output</span><span class="o">,</span> <span class="nx">info$field</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="k">for</span> <span class="p">(</span><span class="k">var</span> <span class="nx">fieldKey</span><span class="o">:*</span> <span class="k">in</span> <span class="k">this</span><span class="p">)</span> <span class="p">{</span>
+                <span class="kd">super</span><span class="p">.</span><span class="nx">writeUnknown</span><span class="p">(</span><span class="nx">output</span><span class="o">,</span> <span class="nx">fieldKey</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+        <span class="cm">/**</span>
+<span class="cm">         *  @private</span>
+<span class="cm">         */</span>
+        <span class="kd">override</span> <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">used_by_generated_code</span> <span class="kd">final</span> <span class="kd">function</span> <span class="nx">readFromSlice</span><span class="p">(</span><span class="nx">input</span><span class="o">:</span><span class="nx">flash</span><span class="p">.</span><span class="nx">utils</span><span class="p">.</span><span class="nb">IDataInput</span><span class="o">,</span> <span class="nx">bytesAfterSlice</span><span class="o">:</span><span class="nb">uint</span><span class="p">)</span><span class="o">:</span><span class="nx">void</span> <span class="p">{</span>
+            <span class="k">var</span> <span class="nx">code$count</span><span class="o">:</span><span class="nb">uint</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+            <span class="k">var</span> <span class="nx">name$count</span><span class="o">:</span><span class="nb">uint</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+            <span class="k">var</span> <span class="nx">info$count</span><span class="o">:</span><span class="nb">uint</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+            <span class="k">while</span> <span class="p">(</span><span class="nx">input</span><span class="p">.</span><span class="nx">bytesAvailable</span> <span class="o">&gt;</span> <span class="nx">bytesAfterSlice</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">var</span> <span class="nx">tag</span><span class="o">:</span><span class="nb">uint</span> <span class="o">=</span> <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">ReadUtils</span><span class="p">.</span><span class="nx">read$TYPE_UINT32</span><span class="p">(</span><span class="nx">input</span><span class="p">);</span>
+                <span class="k">switch</span> <span class="p">(</span><span class="nx">tag</span> <span class="o">&gt;&gt;</span> <span class="mi">3</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">case</span> <span class="mi">1</span><span class="o">:</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="nx">code$count</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                        <span class="k">throw</span> <span class="k">new</span> <span class="nx">flash</span><span class="p">.</span><span class="nx">errors</span><span class="p">.</span><span class="nb">IOError</span><span class="p">(</span><span class="s1">'Bad data format: HelloWorld.code cannot be set twice.'</span><span class="p">);</span>
+                    <span class="p">}</span>
+                    <span class="o">++</span><span class="nx">code$count</span><span class="o">;</span>
+                    <span class="k">this</span><span class="p">.</span><span class="nx">code</span> <span class="o">=</span> <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">ReadUtils</span><span class="p">.</span><span class="nx">read$TYPE_INT32</span><span class="p">(</span><span class="nx">input</span><span class="p">);</span>
+                    <span class="k">break</span><span class="o">;</span>
+                <span class="k">case</span> <span class="mi">2</span><span class="o">:</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="nx">name$count</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                        <span class="k">throw</span> <span class="k">new</span> <span class="nx">flash</span><span class="p">.</span><span class="nx">errors</span><span class="p">.</span><span class="nb">IOError</span><span class="p">(</span><span class="s1">'Bad data format: HelloWorld.name cannot be set twice.'</span><span class="p">);</span>
+                    <span class="p">}</span>
+                    <span class="o">++</span><span class="nx">name$count</span><span class="o">;</span>
+                    <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">ReadUtils</span><span class="p">.</span><span class="nx">read$TYPE_STRING</span><span class="p">(</span><span class="nx">input</span><span class="p">);</span>
+                    <span class="k">break</span><span class="o">;</span>
+                <span class="k">case</span> <span class="mi">3</span><span class="o">:</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="nx">info$count</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                        <span class="k">throw</span> <span class="k">new</span> <span class="nx">flash</span><span class="p">.</span><span class="nx">errors</span><span class="p">.</span><span class="nb">IOError</span><span class="p">(</span><span class="s1">'Bad data format: HelloWorld.info cannot be set twice.'</span><span class="p">);</span>
+                    <span class="p">}</span>
+                    <span class="o">++</span><span class="nx">info$count</span><span class="o">;</span>
+                    <span class="k">this</span><span class="p">.</span><span class="nx">info</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">HelloWorld</span><span class="p">.</span><span class="nx">Info</span><span class="p">();</span>
+                    <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">ReadUtils</span><span class="p">.</span><span class="nx">read$TYPE_MESSAGE</span><span class="p">(</span><span class="nx">input</span><span class="o">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">info</span><span class="p">);</span>
+                    <span class="k">break</span><span class="o">;</span>
+                <span class="k">default</span><span class="o">:</span>
+                    <span class="kd">super</span><span class="p">.</span><span class="nx">readUnknown</span><span class="p">(</span><span class="nx">input</span><span class="o">,</span> <span class="nx">tag</span><span class="p">);</span>
+                    <span class="k">break</span><span class="o">;</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+    <span class="p">}</span>
+<span class="p">}</span>
+
+</pre></div>
+
+<p><strong>Info.as</strong>代码内容</p>
+
+<div class="highlight"><pre><span class="kd">package</span>  <span class="p">{</span>
+    <span class="kd">import</span> <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="o">*;</span>
+    <span class="nx">use</span> <span class="kd">namespace</span> <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">used_by_generated_code</span><span class="o">;</span>
+    <span class="kd">import</span> <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">fieldDescriptors</span><span class="p">.</span><span class="o">*;</span>
+    <span class="kd">import</span> <span class="nx">flash</span><span class="p">.</span><span class="nx">utils</span><span class="p">.</span><span class="nb">Endian</span><span class="o">;</span>
+    <span class="kd">import</span> <span class="nx">flash</span><span class="p">.</span><span class="nx">utils</span><span class="p">.</span><span class="nb">IDataInput</span><span class="o">;</span>
+    <span class="kd">import</span> <span class="nx">flash</span><span class="p">.</span><span class="nx">utils</span><span class="p">.</span><span class="nb">IDataOutput</span><span class="o">;</span>
+    <span class="kd">import</span> <span class="nx">flash</span><span class="p">.</span><span class="nx">utils</span><span class="p">.</span><span class="nb">IExternalizable</span><span class="o">;</span>
+    <span class="kd">import</span> <span class="nx">flash</span><span class="p">.</span><span class="nx">errors</span><span class="p">.</span><span class="nb">IOError</span><span class="o">;</span>
+    <span class="kd">import</span> <span class="nx">HelloWorld</span><span class="p">.</span><span class="nx">Info</span><span class="o">;</span>
+    <span class="c1">// @@protoc_insertion_point(imports)</span>
+
+    <span class="c1">// @@protoc_insertion_point(class_metadata)</span>
+    <span class="kd">public</span> <span class="kd">dynamic</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nx">HelloWorld</span> <span class="kd">extends</span> <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">Message</span> <span class="p">{</span>
+        <span class="cm">/**</span>
+<span class="cm">         *  @private</span>
+<span class="cm">         */</span>
+        <span class="kd">public</span> <span class="kd">static</span> <span class="kd">const</span> <span class="nx">CODE</span><span class="o">:</span><span class="nx">FieldDescriptor$TYPE_INT32</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FieldDescriptor$TYPE_INT32</span><span class="p">(</span><span class="s2">"HelloWorld.code"</span><span class="o">,</span> <span class="s2">"code"</span><span class="o">,</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">3</span><span class="p">)</span> <span class="o">|</span> <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">WireType</span><span class="p">.</span><span class="nx">VARINT</span><span class="p">);</span>
+
+        <span class="kd">private</span> <span class="k">var</span> <span class="nx">code$field</span><span class="o">:</span><span class="nb">int</span><span class="o">;</span>
+
+        <span class="kd">private</span> <span class="k">var</span> <span class="nx">hasField$0</span><span class="o">:</span><span class="nb">uint</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+
+        <span class="kd">public</span> <span class="kd">function</span> <span class="nx">clearCode</span><span class="p">()</span><span class="o">:</span><span class="nx">void</span> <span class="p">{</span>
+            <span class="nx">hasField$0</span> <span class="o">&amp;=</span> <span class="mh">0xfffffffe</span><span class="o">;</span>
+            <span class="nx">code$field</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">int</span><span class="p">();</span>
+        <span class="p">}</span>
+
+        <span class="kd">public</span> <span class="kd">function</span> <span class="kd">get</span> <span class="nx">hasCode</span><span class="p">()</span><span class="o">:</span><span class="nb">Boolean</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="p">(</span><span class="nx">hasField$0</span> <span class="o">&amp;</span> <span class="mh">0x1</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="o">;</span>
+        <span class="p">}</span>
+
+        <span class="kd">public</span> <span class="kd">function</span> <span class="kd">set</span> <span class="nx">code</span><span class="p">(</span><span class="nx">value</span><span class="o">:</span><span class="nb">int</span><span class="p">)</span><span class="o">:</span><span class="nx">void</span> <span class="p">{</span>
+            <span class="nx">hasField$0</span> <span class="o">|=</span> <span class="mh">0x1</span><span class="o">;</span>
+            <span class="nx">code$field</span> <span class="o">=</span> <span class="nx">value</span><span class="o">;</span>
+        <span class="p">}</span>
+
+        <span class="kd">public</span> <span class="kd">function</span> <span class="kd">get</span> <span class="nx">code</span><span class="p">()</span><span class="o">:</span><span class="nb">int</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nx">code$field</span><span class="o">;</span>
+        <span class="p">}</span>
+
+        <span class="cm">/**</span>
+<span class="cm">         *  @private</span>
+<span class="cm">         */</span>
+        <span class="kd">public</span> <span class="kd">static</span> <span class="kd">const</span> <span class="nx">NAME</span><span class="o">:</span><span class="nx">FieldDescriptor$TYPE_STRING</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FieldDescriptor$TYPE_STRING</span><span class="p">(</span><span class="s2">"HelloWorld.name"</span><span class="o">,</span> <span class="s2">"name"</span><span class="o">,</span> <span class="p">(</span><span class="mi">2</span> <span class="o">&lt;&lt;</span> <span class="mi">3</span><span class="p">)</span> <span class="o">|</span> <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">WireType</span><span class="p">.</span><span class="nx">LENGTH_DELIMITED</span><span class="p">);</span>
+
+        <span class="kd">private</span> <span class="k">var</span> <span class="nx">name$field</span><span class="o">:</span><span class="nb">String</span><span class="o">;</span>
+
+        <span class="kd">public</span> <span class="kd">function</span> <span class="nx">clearName</span><span class="p">()</span><span class="o">:</span><span class="nx">void</span> <span class="p">{</span>
+            <span class="nx">name$field</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="p">}</span>
+
+        <span class="kd">public</span> <span class="kd">function</span> <span class="kd">get</span> <span class="nx">hasName</span><span class="p">()</span><span class="o">:</span><span class="nb">Boolean</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nx">name$field</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="p">}</span>
+
+        <span class="kd">public</span> <span class="kd">function</span> <span class="kd">set</span> <span class="nx">name</span><span class="p">(</span><span class="nx">value</span><span class="o">:</span><span class="nb">String</span><span class="p">)</span><span class="o">:</span><span class="nx">void</span> <span class="p">{</span>
+            <span class="nx">name$field</span> <span class="o">=</span> <span class="nx">value</span><span class="o">;</span>
+        <span class="p">}</span>
+
+        <span class="kd">public</span> <span class="kd">function</span> <span class="kd">get</span> <span class="nx">name</span><span class="p">()</span><span class="o">:</span><span class="nb">String</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nx">name$field</span><span class="o">;</span>
+        <span class="p">}</span>
+
+        <span class="cm">/**</span>
+<span class="cm">         *  @private</span>
+<span class="cm">         */</span>
+        <span class="kd">public</span> <span class="kd">static</span> <span class="kd">const</span> <span class="nx">INFO</span><span class="o">:</span><span class="nx">FieldDescriptor$TYPE_MESSAGE</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FieldDescriptor$TYPE_MESSAGE</span><span class="p">(</span><span class="s2">"HelloWorld.info"</span><span class="o">,</span> <span class="s2">"info"</span><span class="o">,</span> <span class="p">(</span><span class="mi">3</span> <span class="o">&lt;&lt;</span> <span class="mi">3</span><span class="p">)</span> <span class="o">|</span> <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">WireType</span><span class="p">.</span><span class="nx">LENGTH_DELIMITED</span><span class="o">,</span> <span class="kd">function</span><span class="p">()</span><span class="o">:</span><span class="nb">Class</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">HelloWorld</span><span class="p">.</span><span class="nx">Info</span><span class="o">;</span> <span class="p">});</span>
+
+        <span class="kd">private</span> <span class="k">var</span> <span class="nx">info$field</span><span class="o">:</span><span class="nx">HelloWorld</span><span class="p">.</span><span class="nx">Info</span><span class="o">;</span>
+
+        <span class="kd">public</span> <span class="kd">function</span> <span class="nx">clearInfo</span><span class="p">()</span><span class="o">:</span><span class="nx">void</span> <span class="p">{</span>
+            <span class="nx">info$field</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="p">}</span>
+
+        <span class="kd">public</span> <span class="kd">function</span> <span class="kd">get</span> <span class="nx">hasInfo</span><span class="p">()</span><span class="o">:</span><span class="nb">Boolean</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nx">info$field</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="p">}</span>
+
+        <span class="kd">public</span> <span class="kd">function</span> <span class="kd">set</span> <span class="nx">info</span><span class="p">(</span><span class="nx">value</span><span class="o">:</span><span class="nx">HelloWorld</span><span class="p">.</span><span class="nx">Info</span><span class="p">)</span><span class="o">:</span><span class="nx">void</span> <span class="p">{</span>
+            <span class="nx">info$field</span> <span class="o">=</span> <span class="nx">value</span><span class="o">;</span>
+        <span class="p">}</span>
+
+        <span class="kd">public</span> <span class="kd">function</span> <span class="kd">get</span> <span class="nx">info</span><span class="p">()</span><span class="o">:</span><span class="nx">HelloWorld</span><span class="p">.</span><span class="nx">Info</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nx">info$field</span><span class="o">;</span>
+        <span class="p">}</span>
+
+        <span class="cm">/**</span>
+<span class="cm">         *  @private</span>
+<span class="cm">         */</span>
+        <span class="kd">override</span> <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">used_by_generated_code</span> <span class="kd">final</span> <span class="kd">function</span> <span class="nx">writeToBuffer</span><span class="p">(</span><span class="nx">output</span><span class="o">:</span><span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">WritingBuffer</span><span class="p">)</span><span class="o">:</span><span class="nx">void</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">hasCode</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">WriteUtils</span><span class="p">.</span><span class="nx">writeTag</span><span class="p">(</span><span class="nx">output</span><span class="o">,</span> <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">WireType</span><span class="p">.</span><span class="nx">VARINT</span><span class="o">,</span> <span class="mi">1</span><span class="p">);</span>
+                <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">WriteUtils</span><span class="p">.</span><span class="nx">write$TYPE_INT32</span><span class="p">(</span><span class="nx">output</span><span class="o">,</span> <span class="nx">code$field</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">hasName</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">WriteUtils</span><span class="p">.</span><span class="nx">writeTag</span><span class="p">(</span><span class="nx">output</span><span class="o">,</span> <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">WireType</span><span class="p">.</span><span class="nx">LENGTH_DELIMITED</span><span class="o">,</span> <span class="mi">2</span><span class="p">);</span>
+                <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">WriteUtils</span><span class="p">.</span><span class="nx">write$TYPE_STRING</span><span class="p">(</span><span class="nx">output</span><span class="o">,</span> <span class="nx">name$field</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">hasInfo</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">WriteUtils</span><span class="p">.</span><span class="nx">writeTag</span><span class="p">(</span><span class="nx">output</span><span class="o">,</span> <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">WireType</span><span class="p">.</span><span class="nx">LENGTH_DELIMITED</span><span class="o">,</span> <span class="mi">3</span><span class="p">);</span>
+                <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">WriteUtils</span><span class="p">.</span><span class="nx">write$TYPE_MESSAGE</span><span class="p">(</span><span class="nx">output</span><span class="o">,</span> <span class="nx">info$field</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="k">for</span> <span class="p">(</span><span class="k">var</span> <span class="nx">fieldKey</span><span class="o">:*</span> <span class="k">in</span> <span class="k">this</span><span class="p">)</span> <span class="p">{</span>
+                <span class="kd">super</span><span class="p">.</span><span class="nx">writeUnknown</span><span class="p">(</span><span class="nx">output</span><span class="o">,</span> <span class="nx">fieldKey</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+        <span class="cm">/**</span>
+<span class="cm">         *  @private</span>
+<span class="cm">         */</span>
+        <span class="kd">override</span> <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">used_by_generated_code</span> <span class="kd">final</span> <span class="kd">function</span> <span class="nx">readFromSlice</span><span class="p">(</span><span class="nx">input</span><span class="o">:</span><span class="nx">flash</span><span class="p">.</span><span class="nx">utils</span><span class="p">.</span><span class="nb">IDataInput</span><span class="o">,</span> <span class="nx">bytesAfterSlice</span><span class="o">:</span><span class="nb">uint</span><span class="p">)</span><span class="o">:</span><span class="nx">void</span> <span class="p">{</span>
+            <span class="k">var</span> <span class="nx">code$count</span><span class="o">:</span><span class="nb">uint</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+            <span class="k">var</span> <span class="nx">name$count</span><span class="o">:</span><span class="nb">uint</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+            <span class="k">var</span> <span class="nx">info$count</span><span class="o">:</span><span class="nb">uint</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+            <span class="k">while</span> <span class="p">(</span><span class="nx">input</span><span class="p">.</span><span class="nx">bytesAvailable</span> <span class="o">&gt;</span> <span class="nx">bytesAfterSlice</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">var</span> <span class="nx">tag</span><span class="o">:</span><span class="nb">uint</span> <span class="o">=</span> <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">ReadUtils</span><span class="p">.</span><span class="nx">read$TYPE_UINT32</span><span class="p">(</span><span class="nx">input</span><span class="p">);</span>
+                <span class="k">switch</span> <span class="p">(</span><span class="nx">tag</span> <span class="o">&gt;&gt;</span> <span class="mi">3</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">case</span> <span class="mi">1</span><span class="o">:</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="nx">code$count</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                        <span class="k">throw</span> <span class="k">new</span> <span class="nx">flash</span><span class="p">.</span><span class="nx">errors</span><span class="p">.</span><span class="nb">IOError</span><span class="p">(</span><span class="s1">'Bad data format: HelloWorld.code cannot be set twice.'</span><span class="p">);</span>
+                    <span class="p">}</span>
+                    <span class="o">++</span><span class="nx">code$count</span><span class="o">;</span>
+                    <span class="k">this</span><span class="p">.</span><span class="nx">code</span> <span class="o">=</span> <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">ReadUtils</span><span class="p">.</span><span class="nx">read$TYPE_INT32</span><span class="p">(</span><span class="nx">input</span><span class="p">);</span>
+                    <span class="k">break</span><span class="o">;</span>
+                <span class="k">case</span> <span class="mi">2</span><span class="o">:</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="nx">name$count</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                        <span class="k">throw</span> <span class="k">new</span> <span class="nx">flash</span><span class="p">.</span><span class="nx">errors</span><span class="p">.</span><span class="nb">IOError</span><span class="p">(</span><span class="s1">'Bad data format: HelloWorld.name cannot be set twice.'</span><span class="p">);</span>
+                    <span class="p">}</span>
+                    <span class="o">++</span><span class="nx">name$count</span><span class="o">;</span>
+                    <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">ReadUtils</span><span class="p">.</span><span class="nx">read$TYPE_STRING</span><span class="p">(</span><span class="nx">input</span><span class="p">);</span>
+                    <span class="k">break</span><span class="o">;</span>
+                <span class="k">case</span> <span class="mi">3</span><span class="o">:</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="nx">info$count</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                        <span class="k">throw</span> <span class="k">new</span> <span class="nx">flash</span><span class="p">.</span><span class="nx">errors</span><span class="p">.</span><span class="nb">IOError</span><span class="p">(</span><span class="s1">'Bad data format: HelloWorld.info cannot be set twice.'</span><span class="p">);</span>
+                    <span class="p">}</span>
+                    <span class="o">++</span><span class="nx">info$count</span><span class="o">;</span>
+                    <span class="k">this</span><span class="p">.</span><span class="nx">info</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">HelloWorld</span><span class="p">.</span><span class="nx">Info</span><span class="p">();</span>
+                    <span class="nx">com</span><span class="p">.</span><span class="nx">netease</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">.</span><span class="nx">ReadUtils</span><span class="p">.</span><span class="nx">read$TYPE_MESSAGE</span><span class="p">(</span><span class="nx">input</span><span class="o">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">info</span><span class="p">);</span>
+                    <span class="k">break</span><span class="o">;</span>
+                <span class="k">default</span><span class="o">:</span>
+                    <span class="kd">super</span><span class="p">.</span><span class="nx">readUnknown</span><span class="p">(</span><span class="nx">input</span><span class="o">,</span> <span class="nx">tag</span><span class="p">);</span>
+                    <span class="k">break</span><span class="o">;</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+    <span class="p">}</span>
+<span class="p">}</span>
+
+</pre></div>
       </section>
     </div>
 
